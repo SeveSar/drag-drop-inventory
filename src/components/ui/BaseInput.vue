@@ -2,7 +2,6 @@
   <div class="form-group">
     <input
       :class="['form-control', { error: error }]"
-      :id="id"
       :value="modelValue"
       @input="updateValue"
       v-bind="$attrs"
@@ -51,34 +50,21 @@ export default defineComponent({
   position: relative;
 }
 .form-control {
-  border-bottom: 1px solid $main-color;
-  height: auto;
-  font-weight: 700;
-  font-family: "Roboto";
-  font-size: 16px;
-  padding: 15px 5px 3px 5px;
-  line-height: 22px;
-  width: 100%;
-  color: $main-color;
-  transition: all 0.2s linear;
-  &::placeholder {
-    color: $main-color;
-  }
-  &:focus {
-    outline: none;
-  }
-  &.error {
-    border-color: red;
-  }
-}
-label {
-  text-align: left;
+  font-weight: 500;
   font-size: 14px;
-  line-height: 18px;
-  display: inline-block;
-  color: #a5a5a5;
-  margin-bottom: 8px;
+  line-height: 17px;
+  background: #262626;
+  border: 1px solid #4d4d4d;
+  border-radius: 4px;
+  color: #fff;
+  height: 40px;
+  width: 100%;
+  padding: 0 12px;
+  &::placeholder {
+    color: rgba(#fff, 0.4);
+  }
 }
+
 small {
   color: red;
   display: inline-block;

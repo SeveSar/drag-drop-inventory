@@ -37,29 +37,20 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .button {
-  font-family: "Roboto";
-  background: $main-color;
-  border-radius: 12px;
-  color: $white-color;
-  padding: 6px 15px;
-  transition: all 0.2s linear;
-  max-height: 30px;
-  &.text {
-    background: transparent;
-    color: $main-color;
-    padding: 0;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  width: 100%;
+  height: 39px;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #2d2d2d;
+  &.red {
+    background: #fa7272;
+    color: #fff;
   }
-  &.border {
-    background: transparent;
-    color: $main-color;
-    border: 1px solid #566885;
-    border-radius: 14px;
-    font-size: 14px;
-    line-height: 16px;
-    &:hover {
-      background-color: $main-color;
-      color: $white-color;
-    }
+  &.small {
+    height: 33px;
   }
 }
 </style>
