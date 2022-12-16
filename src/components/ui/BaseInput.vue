@@ -53,6 +53,8 @@ export default defineComponent({
 .form-control {
   font-weight: 500;
   font-size: 14px;
+  font-family: "SFProDisplay";
+  font-weight: 400;
   line-height: 17px;
   background: #262626;
   border: 1px solid #4d4d4d;

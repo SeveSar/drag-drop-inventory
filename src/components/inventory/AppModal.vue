@@ -1,7 +1,8 @@
 <template>
+  <div class="overlay" v-if="currentItem" @click.self="close"></div>
   <transition name="slide">
     <div v-if="currentItem" class="modal-inventory">
-      <button class="modal-inventory__close" @click="$emit('close')">
+      <button class="modal-inventory__close" @click="close">
         <AppIcon name="IconClose"></AppIcon>
       </button>
       <div class="modal-inventory__header">
@@ -9,13 +10,12 @@
       </div>
 
       <div class="modal-inventory__body">
-        <AppGhost height="30px"></AppGhost>
         <AppGhost
-          height="10px"
           v-for="item in ghostItems"
           :key="item.id"
           :width="item.width"
-          borderRadius="4px"
+          :height="item.height"
+          :borderRadius="item.borderRadius"
         ></AppGhost>
       </div>
       <div class="modal-inventory__footer">
@@ -59,7 +59,8 @@ import AppIcon from "../ui/AppIcon.vue";
 import BaseInput from "../ui/BaseInput.vue";
 import BaseButton from "../ui/BaseButton.vue";
 import type { DragItem } from "./inventory.types";
-import AppGhost from "../ui/AppGhost.vue";
+import AppGhost from "@/components/ui/AppGhost/AppGhost.vue";
+import type { GhostItem } from "@/components/ui/AppGhost/ghost.types";
 export default defineComponent({
   components: {
     AppIcon,
@@ -67,45 +68,94 @@ export default defineComponent({
     BaseButton,
     BaseInput,
   },
+  emits: ["close", "onSumbit"],
   props: {
     currentItem: {
       type: null as unknown as PropType<DragItem | null>,
       required: true,
       validator: (v: any) => typeof v === "object" || v === null,
     },
+    ghostItems: {
+      type: Array as PropType<GhostItem[]>,
+      default: () => [
+        {
+          id: 0,
+          width: "100%",
+          height: "30px",
+          borderRadius: "8px",
+        },
+        {
+          id: 1,
+          width: "100%",
+          height: "10px",
+          borderRadius: "4px",
+        },
+        {
+          id: 2,
+          width: "100%",
+          height: "10px",
+          borderRadius: "4px",
+        },
+        {
+          id: 3,
+          width: "100%",
+          height: "10px",
+          borderRadius: "4px",
+        },
+        {
+          id: 4,
+          width: (180 / 236) * 100 + "%",
+          height: "10px",
+          borderRadius: "4px",
+        },
+        {
+          id: 5,
+          width: (80 / 236) * 100 + "%",
+          height: "10px",
+          borderRadius: "4px",
+        },
+      ],
+    },
   },
 
   setup(props, { emit }) {
     const isControlsActive = ref(false);
     const inputCnt = ref();
-    const ghostItems = [
-      { id: 0, width: "100%" },
-      { id: 1, width: "100%" },
-      { id: 2, width: "100%" },
-      { id: 3, width: "85%" },
-      { id: 4, width: "38%" },
-    ];
+
     const onSubmitForm = () => {
-      if (props.currentItem && props.currentItem.cnt < +inputCnt.value) {
-        alert("Нету такого кол-ва");
-        return false;
+      if (!inputCnt.value) {
+        alert("Введите кол-во");
+        return;
       }
       emit("onSumbit", inputCnt.value);
       inputCnt.value = "";
       isControlsActive.value = false;
     };
+    const close = () => {
+      emit("close");
+      isControlsActive.value = false;
+    };
     return {
-      ghostItems,
       isControlsActive,
       onSubmitForm,
       inputCnt,
+      close,
     };
   },
 });
 </script>
 
 <style scoped lang="scss">
+.overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 555;
+}
 .modal-inventory {
+  z-index: 999;
   max-width: 250px;
   width: 100%;
   position: absolute;
@@ -154,7 +204,8 @@ export default defineComponent({
     margin-top: 24px;
     padding: 0 15px;
     position: absolute;
-    bottom: 20px;
+    bottom: 0;
+    padding-bottom: 20px;
     width: 100%;
     padding-top: 20px;
     background-color: #262626;

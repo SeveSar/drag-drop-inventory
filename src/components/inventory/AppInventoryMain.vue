@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue";
-import type { DropCell, DragItem } from "./inventory.types";
+import type { DragItem } from "./inventory.types";
 import AppIcon from "@/components/ui/AppIcon.vue";
 export default defineComponent({
   components: {
@@ -86,7 +86,7 @@ export default defineComponent({
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(5, 1fr);
-  height: 500px;
+  height: 100%;
   background-color: #4d4d4d;
 
   border: 1px solid #4d4d4d;

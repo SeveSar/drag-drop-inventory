@@ -1,18 +1,7 @@
 <template>
   <div class="inventory">
     <div class="inventory__aside">
-      <AppModal
-        :currentItem="activeItem"
-        @close="activeItem = null"
-        @onSumbit="changeCnt"
-      >
-        <template #header>
-          <AppIcon v-if="activeItem" :name="activeItem.icon"></AppIcon>
-        </template>
-        <template #footer>
-          <AppIcon v-if="activeItem" :name="activeItem.icon"></AppIcon>
-        </template>
-      </AppModal>
+      <AppSkeleton />
     </div>
 
     <div class="inventory__main">
@@ -40,23 +29,23 @@
 import { defineComponent, ref, nextTick } from "vue";
 import AppIcon from "@/components/ui/AppIcon.vue";
 import AppModal from "./AppModal.vue";
-import type { DropCell, DragItem } from "./inventory.types";
-import AppGhost from "../ui/AppGhost.vue";
+import type { DragItem } from "./inventory.types";
+import AppGhost from "@/components/ui/AppGhost/AppGhost.vue";
 import AppInventoryMain from "./AppInventoryMain.vue";
+import AppSkeleton from "../ui/AppSkeleton.vue";
 export default defineComponent({
   components: {
     AppIcon,
     AppModal,
     AppInventoryMain,
     AppGhost,
+    AppSkeleton,
   },
   setup() {
     // state
     const activeItem = ref<DragItem | null>(null);
-
     const savedItems = localStorage.getItem("ITEMS");
     const parsedItems = savedItems ? JSON.parse(savedItems) : savedItems;
-
     const items = ref<DragItem[]>(
       parsedItems || [
         { id: 0, dropCellId: 0, icon: "IconGreen", cnt: 4 },
@@ -101,6 +90,7 @@ export default defineComponent({
     };
     const removeItem = (id: number) => {
       items.value = items.value.filter((item) => item.id !== id);
+      localStorage.setItem("ITEMS", JSON.stringify(items.value));
       const isEmptyInventory = items.value.every((item) => !item.cnt);
       if (isEmptyInventory) {
         localStorage.clear();
@@ -141,7 +131,7 @@ export default defineComponent({
 .inventory {
   display: grid;
   justify-content: center;
-  padding: 25px;
+
   grid-template-columns: 260px 525px;
   grid-template-rows: auto auto;
   max-width: 784px;

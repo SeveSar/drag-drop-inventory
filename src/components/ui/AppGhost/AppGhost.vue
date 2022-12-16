@@ -33,7 +33,19 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+:root {
+  --loading-grey: #ededed;
+}
 .ghost {
+  background-color: #ededed;
   background: linear-gradient(90deg, #3c3c3c 0%, #444444 51.04%, #333333 100%);
+  background-size: 200% 100%;
+  background-position-x: 180%;
+  animation: 1s loading ease-in-out infinite;
+  @keyframes loading {
+    to {
+      background-position-x: -20%;
+    }
+  }
 }
 </style>

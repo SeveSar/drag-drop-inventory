@@ -40,6 +40,8 @@ export default defineComponent({
   font-weight: 400;
   font-size: 14px;
   line-height: 17px;
+  font-family: "SFProDisplay";
+  font-weight: 400;
   width: 100%;
   height: 39px;
   border-radius: 8px;

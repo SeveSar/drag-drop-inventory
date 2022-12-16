@@ -1,5 +1,8 @@
 @import 'reset';
-
+@import 'fonts';
 body {
+  padding: 50px;
   background-color: #1E1E1E;
+  font-family: 'SFProDisplay';
+  font-weight: 400;
 }
