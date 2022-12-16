@@ -5,6 +5,7 @@
       :value="modelValue"
       @input="updateValue"
       v-bind="$attrs"
+      :type="type"
       @focus="$emit('onFocus')"
     />
     <transition name="fade">
@@ -24,9 +25,9 @@ export default defineComponent({
       type: [String, Number],
       default: "",
     },
-    id: {
+    type: {
       type: String,
-      default: "",
+      default: "text",
     },
     error: {
       type: String,

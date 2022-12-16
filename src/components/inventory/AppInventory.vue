@@ -1,36 +1,37 @@
 <template>
   <div class="inventory">
+    <div class="inventory__aside">
+      <AppModal
+        :currentItem="activeItem"
+        @close="activeItem = null"
+        @onSumbit="changeCnt"
+      >
+        <template #header>
+          <AppIcon v-if="activeItem" :name="activeItem.icon"></AppIcon>
+        </template>
+        <template #footer>
+          <AppIcon v-if="activeItem" :name="activeItem.icon"></AppIcon>
+        </template>
+      </AppModal>
+    </div>
+
     <div class="inventory__main">
-      <div class="inventory__grid">
-        <div
-          class="inventory__cell"
-          v-for="cell in dropCells"
-          :key="cell.id"
-          @drop="onDrop($event, cell.id)"
-          @dragover.prevent
-          @dragenter.prevent
-        >
-          <div
-            class="inventory__item"
-            :class="{ active: activeItem?.id === item.id }"
-            v-for="item in items.filter((item) => cell.id === item.dropCellId)"
-            :key="item.id"
-            draggable="true"
-            @click.prevent="setActiveItem(item)"
-            @dragstart="onDragStart($event, item)"
-          >
-            <AppIcon :name="item.icon"></AppIcon>
-            <span class="inventory__item-cnt">
-              {{ item.cnt }}
-            </span>
-          </div>
-        </div>
-      </div>
-      <AppMoodal
+      <AppInventoryMain
+        @update:activeItem="setActiveItem"
+        :activeItem="activeItem"
+        :items="items"
+        @onDrop="onDrop"
+        @onDragStart="onDragStart"
+      />
+      <AppModal
         :currentItem="activeItem"
         @close="activeItem = null"
         @onSumbit="changeCnt"
       />
+    </div>
+    <div class="inventory__footer">
+      <AppIcon class="inventory__close" name="IconClose"></AppIcon>
+      <AppGhost height="36px" borderRadius="12px"></AppGhost>
     </div>
   </div>
 </template>
@@ -38,43 +39,21 @@
 <script lang="ts">
 import { defineComponent, ref, nextTick } from "vue";
 import AppIcon from "@/components/ui/AppIcon.vue";
-import AppMoodal from "./AppMoodal.vue";
+import AppModal from "./AppModal.vue";
 import type { DropCell, DragItem } from "./inventory.types";
+import AppGhost from "../ui/AppGhost.vue";
+import AppInventoryMain from "./AppInventoryMain.vue";
 export default defineComponent({
   components: {
     AppIcon,
-    AppMoodal,
+    AppModal,
+    AppInventoryMain,
+    AppGhost,
   },
   setup() {
     // state
     const activeItem = ref<DragItem | null>(null);
-    const dropCells: DropCell[] = [
-      { id: 0 },
-      { id: 1 },
-      { id: 2 },
-      { id: 3 },
-      { id: 4 },
-      { id: 5 },
-      { id: 6 },
-      { id: 7 },
-      { id: 8 },
-      { id: 9 },
-      { id: 10 },
-      { id: 11 },
-      { id: 12 },
-      { id: 13 },
-      { id: 14 },
-      { id: 15 },
-      { id: 16 },
-      { id: 17 },
-      { id: 18 },
-      { id: 19 },
-      { id: 20 },
-      { id: 21 },
-      { id: 22 },
-      { id: 23 },
-      { id: 24 },
-    ];
+
     const savedItems = localStorage.getItem("ITEMS");
     const parsedItems = savedItems ? JSON.parse(savedItems) : savedItems;
 
@@ -98,6 +77,7 @@ export default defineComponent({
     };
 
     const onDrop = (event: DragEvent, dropCellId: number) => {
+      console.log(event);
       const itemId = Number(event.dataTransfer?.getData("itemId"));
       const itemTheSameCellId = items.value.find(
         (item) => item.dropCellId === dropCellId
@@ -119,14 +99,39 @@ export default defineComponent({
         });
       }
     };
+    const removeItem = (id: number) => {
+      items.value = items.value.filter((item) => item.id !== id);
+      const isEmptyInventory = items.value.every((item) => !item.cnt);
+      if (isEmptyInventory) {
+        localStorage.clear();
+      }
+    };
+    const changeCnt = (cnt: number) => {
+      items.value = items.value.map((item) => {
+        if (activeItem.value?.id === item.id) {
+          return {
+            ...item,
+            cnt: Math.max(0, item.cnt - cnt),
+          };
+        }
+        return item;
+      });
+      activeItem.value = null;
+      localStorage.setItem("ITEMS", JSON.stringify(items.value));
+      items.value.forEach((item) => {
+        if (item.cnt <= 0) {
+          removeItem(item.id);
+        }
+      });
+    };
 
     return {
-      dropCells,
       items,
       onDrop,
       onDragStart,
       setActiveItem,
       activeItem,
+      changeCnt,
     };
   },
 });
@@ -134,60 +139,39 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .inventory {
-  background: #262626;
-  display: flex;
+  display: grid;
   justify-content: center;
   padding: 25px;
+  grid-template-columns: 260px 525px;
+  grid-template-rows: auto auto;
+  max-width: 784px;
+
+  width: 100%;
+  margin: 0 auto;
 
   &__main {
-    max-width: 525px;
     width: 100%;
+    grid-column-start: span 3;
     position: relative;
     overflow: hidden;
   }
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    height: 500px;
-    background-color: #4d4d4d;
-    max-width: 525px;
+  &__aside {
+    grid-column-start: span 1;
+    margin-right: 24px;
+  }
+  &__footer {
+    margin-top: 24px;
+    background: #262626;
+    grid-column-start: span 5;
+    padding: 18px 66px 18px 18px;
     border: 1px solid #4d4d4d;
-    width: 100%;
     border-radius: 12px;
-    overflow: hidden;
-  }
-  &__cell {
-    border-left: 1px solid #4d4d4d;
-    border-bottom: 1px solid #4d4d4d;
-    background-color: #262626;
-  }
-  &__item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    cursor: pointer;
     position: relative;
-    &.active {
-      background-color: #2f2f2f;
-    }
-    &-cnt {
-      position: absolute;
-      right: 0;
-      bottom: -1px;
-      font-weight: 500;
-      font-size: 10px;
-      line-height: 12px;
-      border: 1px solid #4d4d4d;
-      border-radius: 6px 0px 0px 0px;
-      width: 16px;
-      height: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: rgba(#ffffff, 0.4);
-    }
+  }
+  &__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
   }
 }
 </style>

@@ -31,6 +31,8 @@
             <BaseInput
               placeholder="Введите количество"
               v-model="inputCnt"
+              type="number"
+              :max="currentItem.cnt"
             ></BaseInput>
             <div class="modal-inventory__actions">
               <BaseButton
@@ -75,7 +77,7 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const isControlsActive = ref(false);
-    const inputCnt = ref("");
+    const inputCnt = ref();
     const ghostItems = [
       { id: 0, width: "100%" },
       { id: 1, width: "100%" },
@@ -84,11 +86,13 @@ export default defineComponent({
       { id: 4, width: "38%" },
     ];
     const onSubmitForm = () => {
-      if (!inputCnt.value) {
-        alert("Введите кол-во");
+      if (props.currentItem && props.currentItem.cnt < +inputCnt.value) {
+        alert("Нету такого кол-ва");
         return false;
       }
-      emit("onSumbit");
+      emit("onSumbit", inputCnt.value);
+      inputCnt.value = "";
+      isControlsActive.value = false;
     };
     return {
       ghostItems,
